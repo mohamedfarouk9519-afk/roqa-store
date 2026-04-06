@@ -1,3 +1,6 @@
+
+import { formatPrice } from "@/lib/utils";
+
 export default function ProductCard({ product, onAddToCart }) {
   return (
     <div className="product-card">
@@ -11,7 +14,7 @@ export default function ProductCard({ product, onAddToCart }) {
 
       <div className="product-content">
         <h3 className="product-name">{product.name}</h3>
-        <p className="product-price">{formatPrice(product.price)}</p>
+        <p className="product-price">{product.price} ج.م</p>
 
         <button
           className="product-add-btn"
