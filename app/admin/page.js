@@ -1,5 +1,6 @@
 "use client";
 
+import { supabase } from "@/lib/supabase";
 import { useEffect, useMemo, useState } from "react";
 
 export default function AdminPage() {
@@ -34,6 +35,29 @@ export default function AdminPage() {
   useEffect(() => {
     loadProducts();
     loadCategories();
+  }, []);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const res = await fetch("/api/check-admin");
+      const result = await res.json();
+
+      if (!result.isAdmin) {
+        alert("غير مصرح لك");
+        window.location.href = "/";
+      }
+    }
+
+    checkAdmin();
   }, []);
 
   function handleImageChange(e) {
@@ -159,6 +183,13 @@ export default function AdminPage() {
     alert("تم حذف المنتج");
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    document.cookie =
+      "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    window.location.href = "/login";
+  };
+
   return (
     <main
       style={{
@@ -182,13 +213,22 @@ export default function AdminPage() {
           </h1>
 
           <div style={{ display: "flex", gap: "12px" }}>
-            <button type="button" style={smallBtn}>رجوع</button>
-            <button type="button" style={smallBtn}>السلة</button>
+            <button type="button" style={smallBtn}>
+              رجوع
+            </button>
+            <button type="button" style={smallBtn}>
+              السلة
+            </button>
+            <button type="button" style={smallBtn} onClick={handleLogout}>
+              تسجيل خروج
+            </button>
           </div>
         </div>
 
         <section style={heroCard}>
-          <h2 style={{ color: "#c0527c", margin: "0 0 8px 0", fontSize: "42px" }}>
+          <h2
+            style={{ color: "#c0527c", margin: "0 0 8px 0", fontSize: "42px" }}
+          >
             لوحة تحكم الأدمن
           </h2>
           <p style={{ color: "#8a6675", margin: 0 }}>
@@ -288,7 +328,10 @@ export default function AdminPage() {
             {products.map((product) => (
               <div key={product.id} style={productCard}>
                 <img
-                  src={product.image_url || "https://via.placeholder.com/400x300?text=No+Image"}
+                  src={
+                    product.image_url ||
+                    "https://via.placeholder.com/400x300?text=No+Image"
+                  }
                   alt={product.name}
                   style={productImage}
                 />
@@ -359,7 +402,13 @@ export default function AdminPage() {
                     </>
                   ) : (
                     <>
-                      <h4 style={{ margin: "0 0 8px", fontSize: "22px", color: "#6c3a52" }}>
+                      <h4
+                        style={{
+                          margin: "0 0 8px",
+                          fontSize: "22px",
+                          color: "#6c3a52",
+                        }}
+                      >
                         {product.name}
                       </h4>
                       <p style={{ margin: "0 0 6px", color: "#8f6a79" }}>
