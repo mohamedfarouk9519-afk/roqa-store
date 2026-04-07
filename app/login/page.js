@@ -10,19 +10,25 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-  alert(error.message);
-  return;
-}
+      if (error) {
+        alert(error.message);
+        return;
+      }
 
-    if (data.session) {
-      document.cookie = `sb-access-token=${data.session.access_token}; path=/`;
-      window.location.href = "/admin";
+      if (data.session?.access_token) {
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/`;
+        window.location.href = "/admin";
+      } else {
+        alert("لم يتم إنشاء session");
+      }
+    } catch (err) {
+      alert(err.message || "Failed to fetch");
     }
   };
 

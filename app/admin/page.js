@@ -85,13 +85,8 @@ export default function AdminPage() {
     formData.append("price", price);
     formData.append("category_id", categoryId);
 
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
-
-    if (imageUrl) {
-      formData.append("image_url", imageUrl);
-    }
+    if (imageFile) formData.append("image", imageFile);
+    if (imageUrl) formData.append("image_url", imageUrl);
 
     const res = await fetch("/api/products", {
       method: "POST",
@@ -139,13 +134,8 @@ export default function AdminPage() {
     formData.append("price", editPrice);
     formData.append("category_id", editCategoryId);
 
-    if (editImageFile) {
-      formData.append("image", editImageFile);
-    }
-
-    if (editImageUrl) {
-      formData.append("image_url", editImageUrl);
-    }
+    if (editImageFile) formData.append("image", editImageFile);
+    if (editImageUrl) formData.append("image_url", editImageUrl);
 
     const res = await fetch(`/api/products/${id}`, {
       method: "PUT",
@@ -213,12 +203,8 @@ export default function AdminPage() {
           </h1>
 
           <div style={{ display: "flex", gap: "12px" }}>
-            <button type="button" style={smallBtn}>
-              رجوع
-            </button>
-            <button type="button" style={smallBtn}>
-              السلة
-            </button>
+            <button type="button" style={smallBtn}>رجوع</button>
+            <button type="button" style={smallBtn}>السلة</button>
             <button type="button" style={smallBtn} onClick={handleLogout}>
               تسجيل خروج
             </button>
@@ -226,9 +212,7 @@ export default function AdminPage() {
         </div>
 
         <section style={heroCard}>
-          <h2
-            style={{ color: "#c0527c", margin: "0 0 8px 0", fontSize: "42px" }}
-          >
+          <h2 style={{ color: "#c0527c", margin: "0 0 8px 0", fontSize: "42px" }}>
             لوحة تحكم الأدمن
           </h2>
           <p style={{ color: "#8a6675", margin: 0 }}>
@@ -257,31 +241,17 @@ export default function AdminPage() {
             <div style={formGrid}>
               <div>
                 <label style={label}>اسم المنتج</label>
-                <input
-                  style={input}
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                <input style={input} type="text" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
 
               <div>
                 <label style={label}>السعر</label>
-                <input
-                  style={input}
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
+                <input style={input} type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
               </div>
 
               <div>
                 <label style={label}>القسم</label>
-                <select
-                  style={input}
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                >
+                <select style={input} value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
                   <option value="">اختار القسم</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -293,31 +263,17 @@ export default function AdminPage() {
 
               <div>
                 <label style={label}>رابط الصورة</label>
-                <input
-                  style={input}
-                  type="text"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                />
+                <input style={input} type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
               </div>
 
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={label}>أو اختاري صورة من الجهاز</label>
-                <input
-                  style={fileInput}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                <p style={hint}>
-                  يمكنك إدخال رابط صورة أو اختيار صورة من الجهاز
-                </p>
+                <input style={fileInput} type="file" accept="image/*" onChange={handleImageChange} />
+                <p style={hint}>يمكنك إدخال رابط صورة أو اختيار صورة من الجهاز</p>
               </div>
             </div>
 
-            <button type="submit" style={submitBtn}>
-              إضافة المنتج
-            </button>
+            <button type="submit" style={submitBtn}>إضافة المنتج</button>
           </form>
         </section>
 
@@ -328,10 +284,7 @@ export default function AdminPage() {
             {products.map((product) => (
               <div key={product.id} style={productCard}>
                 <img
-                  src={
-                    product.image_url ||
-                    "https://via.placeholder.com/400x300?text=No+Image"
-                  }
+                  src={product.image_url || "https://via.placeholder.com/400x300?text=No+Image"}
                   alt={product.name}
                   style={productImage}
                 />
@@ -384,31 +337,17 @@ export default function AdminPage() {
                       />
 
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button
-                          type="button"
-                          style={saveBtn}
-                          onClick={() => handleUpdate(product.id)}
-                        >
+                        <button type="button" style={saveBtn} onClick={() => handleUpdate(product.id)}>
                           حفظ
                         </button>
-                        <button
-                          type="button"
-                          style={cancelBtn}
-                          onClick={cancelEdit}
-                        >
+                        <button type="button" style={cancelBtn} onClick={cancelEdit}>
                           إلغاء
                         </button>
                       </div>
                     </>
                   ) : (
                     <>
-                      <h4
-                        style={{
-                          margin: "0 0 8px",
-                          fontSize: "22px",
-                          color: "#6c3a52",
-                        }}
-                      >
+                      <h4 style={{ margin: "0 0 8px", fontSize: "22px", color: "#6c3a52" }}>
                         {product.name}
                       </h4>
                       <p style={{ margin: "0 0 6px", color: "#8f6a79" }}>
@@ -419,18 +358,10 @@ export default function AdminPage() {
                       </p>
 
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button
-                          type="button"
-                          style={editBtn}
-                          onClick={() => startEdit(product)}
-                        >
+                        <button type="button" style={editBtn} onClick={() => startEdit(product)}>
                           تعديل
                         </button>
-                        <button
-                          type="button"
-                          style={deleteBtn}
-                          onClick={() => handleDelete(product.id)}
-                        >
+                        <button type="button" style={deleteBtn} onClick={() => handleDelete(product.id)}>
                           حذف
                         </button>
                       </div>
@@ -450,9 +381,7 @@ function StatCard({ title, value }) {
   return (
     <div style={statCard}>
       <div style={{ color: "#9c7a88", marginBottom: 8 }}>{title}</div>
-      <div style={{ color: "#cb5d89", fontWeight: "700", fontSize: "26px" }}>
-        {value}
-      </div>
+      <div style={{ color: "#cb5d89", fontWeight: "700", fontSize: "26px" }}>{value}</div>
     </div>
   );
 }
