@@ -9,7 +9,7 @@ const supabase = createClient(
 export async function GET() {
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+.select("*, categories(name)")
     .order("id", { ascending: false });
 
   if (error) {
@@ -25,7 +25,7 @@ export async function POST(req) {
 
     const name = formData.get("name");
     const price = formData.get("price");
-    const category = formData.get("category");
+    const category_id = formData.get("category_id");
     const image = formData.get("image");
     const image_url_input = formData.get("image_url");
 
@@ -67,12 +67,13 @@ export async function POST(req) {
   {
     name,
     price: Number(price),
+    category_id: category_id || null,
     image_url,
   },
 ])
       .select();
 
-console.log("INSERT DATA:", { name, price, category, image_url });
+console.log("INSERT DATA:", { name, price, category_id, image_url });
 console.log("SUPABASE INSERT RESULT:", data, error);
 
     if (error) {

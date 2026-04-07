@@ -12,7 +12,7 @@ export async function PUT(req, { params }) {
 
     const name = formData.get("name");
     const price = formData.get("price");
-    const category = formData.get("category");
+    const category_id = formData.get("category_id");
     const image = formData.get("image");
     const image_url_input = formData.get("image_url");
 
@@ -49,10 +49,10 @@ export async function PUT(req, { params }) {
     }
 
     const payload = {
-      name,
-      price: Number(price),
-      category,
-    };
+  name,
+  price: Number(price),
+  category_id: category_id || null,
+};
 
     if (image_url) {
       payload.image_url = image_url;

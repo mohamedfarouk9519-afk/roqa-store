@@ -8,14 +8,14 @@ export default function AdminPage() {
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageFile, setImageFile] = useState(null);
 
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
   const [editPrice, setEditPrice] = useState("");
-  const [editCategory, setEditCategory] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
   const [editImageFile, setEditImageFile] = useState(null);
 
@@ -26,13 +26,9 @@ export default function AdminPage() {
   }
 
   async function loadCategories() {
-    try {
-      const res = await fetch("/api/categories", { cache: "no-store" });
-      const data = await res.json();
-      setCategories(Array.isArray(data) ? data : []);
-    } catch {
-      setCategories([]);
-    }
+    const res = await fetch("/api/categories", { cache: "no-store" });
+    const data = await res.json();
+    setCategories(Array.isArray(data) ? data : []);
   }
 
   useEffect(() => {
@@ -63,7 +59,7 @@ export default function AdminPage() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
-    formData.append("category", category);
+    formData.append("category_id", categoryId);
 
     if (imageFile) {
       formData.append("image", imageFile);
@@ -87,7 +83,7 @@ export default function AdminPage() {
 
     setName("");
     setPrice("");
-    setCategory("");
+    setCategoryId("");
     setImageUrl("");
     setImageFile(null);
 
@@ -99,7 +95,7 @@ export default function AdminPage() {
     setEditingId(product.id);
     setEditName(product.name || "");
     setEditPrice(String(product.price ?? ""));
-    setEditCategory(product.category || product.category_id || "");
+    setEditCategoryId(product.category_id || "");
     setEditImageUrl(product.image_url || "");
     setEditImageFile(null);
   };
@@ -108,7 +104,7 @@ export default function AdminPage() {
     setEditingId(null);
     setEditName("");
     setEditPrice("");
-    setEditCategory("");
+    setEditCategoryId("");
     setEditImageUrl("");
     setEditImageFile(null);
   };
@@ -117,7 +113,7 @@ export default function AdminPage() {
     const formData = new FormData();
     formData.append("name", editName);
     formData.append("price", editPrice);
-    formData.append("category", editCategory);
+    formData.append("category_id", editCategoryId);
 
     if (editImageFile) {
       formData.append("image", editImageFile);
@@ -186,8 +182,8 @@ export default function AdminPage() {
           </h1>
 
           <div style={{ display: "flex", gap: "12px" }}>
-            <button style={smallBtn}>رجوع</button>
-            <button style={smallBtn}>السلة</button>
+            <button type="button" style={smallBtn}>رجوع</button>
+            <button type="button" style={smallBtn}>السلة</button>
           </div>
         </div>
 
@@ -241,13 +237,18 @@ export default function AdminPage() {
 
               <div>
                 <label style={label}>القسم</label>
-                <input
+                <select
                   style={input}
-                  type="text"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  placeholder="مثال: ورد"
-                />
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                >
+                  <option value="">اختار القسم</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -311,13 +312,18 @@ export default function AdminPage() {
                         placeholder="السعر"
                       />
 
-                      <input
+                      <select
                         style={{ ...input, marginBottom: 10 }}
-                        type="text"
-                        value={editCategory}
-                        onChange={(e) => setEditCategory(e.target.value)}
-                        placeholder="القسم"
-                      />
+                        value={editCategoryId}
+                        onChange={(e) => setEditCategoryId(e.target.value)}
+                      >
+                        <option value="">اختار القسم</option>
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
 
                       <input
                         style={{ ...input, marginBottom: 10 }}
@@ -360,7 +366,7 @@ export default function AdminPage() {
                         {product.price} ج.م
                       </p>
                       <p style={{ margin: "0 0 14px", color: "#8f6a79" }}>
-                        {product.category || "بدون قسم"}
+                        {product.categories?.name || "بدون قسم"}
                       </p>
 
                       <div style={{ display: "flex", gap: 8 }}>
