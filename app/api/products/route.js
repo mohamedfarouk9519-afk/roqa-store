@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isAdminUser } from "@/lib/isAdmin";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 export async function GET() {
   const { data, error } = await supabase
     .from("products")
-.select("*, categories(name)")
-    .order("id", { ascending: false });
+    .select("*, categories(name)")
+    .order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -21,29 +22,34 @@ export async function GET() {
 
 export async function POST(req) {
   try {
+    const admin = await isAdminUser();
+    if (!admin.ok) {
+      return NextResponse.json({ error: "غير مصرح لك" }, { status: 403 });
+    }
+
     const formData = await req.formData();
 
-    const name = formData.get("name");
-    const price = formData.get("price");
-    const category_id = formData.get("category_id");
-    const image = formData.get("image");
-    const image_url_input = formData.get("image_url");
+    const name = String(formData.get("name") || "");
+    const price = Number(formData.get("price") || 0);
+    const category_id = formData.get("category_id") || null;
+    const imageFile = formData.get("image");
+    const imageUrlInput = String(formData.get("image_url") || "");
 
-    let image_url = image_url_input || "";
+    let image_url = imageUrlInput;
 
-    if (image && typeof image === "object" && image.size > 0) {
-      const fileExt = image.name.split(".").pop();
+    if (imageFile instanceof File && imageFile.size > 0) {
+      const fileExt = imageFile.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
         .slice(2)}.${fileExt}`;
 
-      const arrayBuffer = await image.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      const arrayBuffer = await imageFile.arrayBuffer();
+      const fileBuffer = Buffer.from(arrayBuffer);
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
-        .upload(fileName, buffer, {
-          contentType: image.type,
+        .upload(fileName, fileBuffer, {
+          contentType: imageFile.type,
           upsert: false,
         });
 
@@ -61,31 +67,27 @@ export async function POST(req) {
       image_url = publicUrlData.publicUrl;
     }
 
+    const payload = {
+      name,
+      price,
+      category_id,
+      image_url,
+    };
+
     const { data, error } = await supabase
       .from("products")
-      .insert([
-  {
-    name,
-    price: Number(price),
-    category_id: category_id || null,
-    image_url,
-  },
-])
-      .select();
-
-console.log("INSERT DATA:", { name, price, category_id, image_url });
-console.log("SUPABASE INSERT RESULT:", data, error);
+      .insert([payload])
+      .select("*, categories(name)");
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data[0]);
+    return NextResponse.json(data?.[0] || null);
   } catch (error) {
-  console.error("POST /api/products error:", error);
-  return NextResponse.json(
-    { error: error.message || "Something went wrong" },
-    { status: 500 }
-  );
-}
+    return NextResponse.json(
+      { error: error.message || "Something went wrong" },
+      { status: 500 }
+    );
+  }
 }
